@@ -1,7 +1,12 @@
 ---
 title: "Lista 1 Bioestat"
-output: html_notebook
+output: github_document
 ---
+
+```{r, echo=FALSE, results='hide', warning = FALSE, message=FALSE}
+library(rmarkdown)
+```
+
 
 # Question 1
 
