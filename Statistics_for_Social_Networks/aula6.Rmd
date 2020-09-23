@@ -1,0 +1,102 @@
+---
+title: "Aula 6: Grafo Rico Fica Mais Rico"
+output: md_document
+---
+
+# Caudas Pesadas
+
+Seja $q(k)$, $k = 0, 1, 2, \dots$ uma distribuição de probabilidade no conjunto $\mathbb{N} = \{0, 1, 2, \dots \}$ dos números naturais.
+
+Isso significa que $q(k) \in [0, 1]$, para todo $k \in N$ e a série $\sum_{k=0}^{+ \infty} q(k)$ é somável com $\sum_{k=0}^{+ \infty} q(k) = 1$.
+
+Se a série é somável, seu resto
+
+$$R(K) = \sum_{k \geq K} q(k) \to 0,$$
+quando $K \to +\infty$. 
+
+Dizemos que a cauda da distribuição $q$ é **pesada** se $R(K)$ decresce para zero muito mais lentamente do que uma distribuição exponencial.
+
+# O peso da cauda dos vértices de $G(N, p)$
+
+Vamos olhar a distribuição de $D(v)$ em $G(N, p)$, escrevendo $D_N(v)$ em vez de $D(v)$.
+
+**Pulando o rigor matemático por ora (vide slides da aula 6)**
+
+A cauda da $N(0, 1)$ decresce exponencialmente.
+
+Conclusão: A cauda de $D_N(1)$ decresce rapidamente quando se afasta de seu valor médio $N_p$. Logo, desse ponto de vista, **$G(N, p)$ não é um bom modelo para redes sociais.**
+
+# Grafos rico fica mais rico
+
+- Tanto o conjunto dos vértices, quanto o conjunto das arestas evolui ao longo do tempo.
+
+- Isso o torna um modelo interessante para descrever como uma rede social se estabelece e evolui ao longo do tempo.
+
+Vamos trabalhar com tempo $t$ evoluindo de maneira discreta, $t = 0, 1, 2, \dots$.
+
+Para todo $t = 0, 1, 2, \dots$, $G_t = (V_t , E_t )$ é o grafo produzido pela evolução do sistema até o instante $t$ inclusivo. Para todo $v \in V_t$ denotamos $D_t(v)$ o grau de $v$ no grafo $G_t$. Também denotamos $M_t$ a matriz de adjacência do grafo $G_t$.
+
+- Vamos supor por ora que esses grafos são não dirigidos.
+
+### Definição da cadeia de grafos $G_t = (V_t , E_t)$, $t ≥ 0$.
+
+1. **Inicialização**: Definimos $V_0 = {1, \dots, N_0}$ com $N_0 ≥ 2$ qualquer fixado e um conjunto de arestas $E_0$ de modo que o grau $D_0(v) ≥ 1$ para todo $v \in V_0$.
+
+2. Para todo $t ≥ 1$:
+    1. $V_t = V_{t−1} \cup {|V_{t−1}| + 1}$.
+    2. $E_t = E_{t−1} \cup {|V_{t−1}| + 1, \xi_t }$, onde $\xi_t$ é um elemento de $V_{t−1}$
+escolhido aleatóriamente com a distribuição
+
+$$\mathbb{P}(\xi_t = v) = \frac{D_{t-1}(v)}{\sum_{v' \in V_{t-1} D_{t-1}(v')}}$$
+Os atores que vão entrando sucessivamente nesta rede social vêm do reservatório infinito $\{1, 2, \dots\}$.
+
+Se $V_0 = \{1, \dots, N_0\}$, então $V_t$ terá como atores 
+$\{1, \dots, N_0 , N_0 + 1, \dots, N_0 + t\}$.
+
+Cada novo ator escolhe um ator já presente na rede com o qual ligar. Essa escolha é influenciada pelo grau dos atores no instante anterior. Quanto maior for o grau de um ator no instante anterior, maior será a sua probabilidade de ser escolhido pelo novo ator que entrou no instante seguinte.
+
+A probabilidade de escolha de um ator já presente como parceiro do novo ator é proporcional ao seu grau anterior.
+
+Daí o nome rico fica mais rico.
+
+# Question 1
+
+Escreva um código para implementar o grafo rico fica mais rico.
+Use esse código para simular a evolução de um sistema começando com $N_0 = 2$ e $M_0(1, 2) = 1$.
+
+```{r, message=FALSE, warning=FALSE}
+library(igraph)
+library(ggplot2)
+source("rich_graph.R")
+```
+
+
+```{r}
+set.seed(2)
+
+g1 <- rich_get_richer_graph(N0 = 2, M0 = c(1,2), t = 100, plot_gV0 = TRUE)
+
+#Plot final graph  
+plot(g1, vertex.label = NA, edge.color = "black", 
+       vertex.size = 10)
+
+```
+# Question 2
+
+A classe de grafos rico fica mais rico foi feita especificamente para obter vértices com caudas pesadas. Verifique na sua simulação se isso acontece.
+
+```{r}
+#Let's generate a larger graph
+g1 <- rich_get_richer_graph(N0 = 2, M0 = c(1,2), t = 1000, plot_gV0 = FALSE)
+
+#plot degree distribution
+df <- data.frame(degree = table(degree(g1)))
+
+ggplot(df) + 
+  aes(x = degree.Var1, y = degree.Freq) +
+  geom_point() +
+  labs(x = "Number of vertices", y = "Frequency")
+
+
+```
+Pela figura podemos ver que a rede gerada tem caudas pesadas, com poucos vertices com muitas conexões e muitos vertices com poucas conexões.

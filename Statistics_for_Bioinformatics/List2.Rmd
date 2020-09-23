@@ -1,0 +1,124 @@
+---
+title: "Lista 2 Bioestat"
+output:
+  html_notebook: default
+  pdf_document: default
+---
+
+```{r, echo=FALSE, results='hide', warning = FALSE, message=FALSE}
+library(rmarkdown)
+```
+
+# Question 1
+
+Os dados a seguir correspondem a médias de uma variável quantitativa de acordo com o genótipo conjunto de dois locos de marcadores moleculares (do tipo *Single Nucleotide Polimorphsms*, SNPA e SNPB, para 7 populações sob estudo. As ações gênicas nessas populações são denominadas como: 
+
+- P1: Ação gênica intermediária; 
+- P2: Dominância completa;
+- P3: Ação gênica complementar; 
+- P4: Epistasia complexa; 
+- P5: Dominância parcial; 
+- P6: Superdominância; 
+- P7: Ação gênica duplicada. \
+
+```{r, echo=FALSE}
+library(reshape2)
+```
+
+
+```{r}
+#Genótipos
+SNPA = c(rep(c("aa", "Aa", "AA"), 21))
+SNPB = c(rep(c("bb", "Bb", "BB"), 21))
+
+#vamos colocar os dados das sete populacoes num dataframe
+# dados <- data.frame(P = c(rep(seq(1,7), each = 9)),
+#                 value =  c(20, 18, 16, 17, 15, 13, 14, 12, 10,
+#                            20, 20, 16, 20, 20, 16, 14, 14, 10,
+#                            20, 20, 10, 20, 20, 10, 10, 10, 10,
+#                            38.7, 6.6, 3.2, 4.0, 2.0, 3.0, 2.7, 3.4, 1.6,
+#                            20, 19, 16, 19, 18, 15, 14, 13, 10,
+#                            20, 21, 16, 22, 23, 18, 14, 15, 10,
+#                            20, 20, 20, 20, 20, 20, 20, 20, 10),
+#                 SNPA = c(rep(rep(c("aa", "Aa", "AA"), each = 3), 7)),
+#                 SNPB = c(rep(c("bb", "Bb", "BB"), 21)))
+
+p_list <- list(data.frame(media = c(20, 18, 16, 17, 15, 13, 14, 12, 10),
+                     SNPA = c(rep(c("aa", "Aa", "AA"), each = 3)),
+                     SNPB = c(rep(c("bb", "Bb", "BB"), 3))),
+          data.frame(media = c(20, 20, 16, 20, 20, 16, 14, 14, 10),
+                     SNPA = c(rep(c("aa", "Aa", "AA"), each = 3)),
+                     SNPB = c(rep(c("bb", "Bb", "BB"), 3))),
+          data.frame(media = c(20, 20, 10, 20, 20, 10, 10, 10, 10),
+                     SNPA = c(rep(c("aa", "Aa", "AA"), each = 3)),
+                     SNPB = c(rep(c("bb", "Bb", "BB"), 3))),
+          data.frame(media = c(38.7, 6.6, 3.2, 4.0, 2.0, 3.0, 2.7, 3.4, 1.6),
+                     SNPA = c(rep(c("aa", "Aa", "AA"), each = 3)),
+                     SNPB = c(rep(c("bb", "Bb", "BB"), 3))),
+          data.frame(media = c(20, 19, 16, 19, 18, 15, 14, 13, 10),
+                     SNPA = c(rep(c("aa", "Aa", "AA"), each = 3)),
+                     SNPB = c(rep(c("bb", "Bb", "BB"), 3))),
+          data.frame(media = c(20, 21, 16, 22, 23, 18, 14, 15, 10),
+                     SNPA = c(rep(c("aa", "Aa", "AA"), each = 3)),
+                     SNPB = c(rep(c("bb", "Bb", "BB"), 3))),
+          data.frame(media = c(20, 20, 20, 20, 20, 20, 20, 20, 10),
+                     SNPA = c(rep(c("aa", "Aa", "AA"), each = 3)),
+                     SNPB = c(rep(c("bb", "Bb", "BB"), 3)))
+) 
+
+
+
+       # aa = ifelse(SNPA == "aa", 1, 0),
+       #          Aa = ifelse(SNPA == "Aa", 1, 0),
+       #          AA = ifelse(SNPA == "AA", 1, 0),
+       #          bb = ifelse(SNPB == "bb", 1, 0),
+       #          Bb = ifelse(SNPB == "Bb", 1, 0),
+       #          BB = ifelse(SNPB == "BB", 1, 0))
+
+```
+
+### Item A: Para cada população (P1 a P7) construa o gráfico de perfis de médias correspondente. Com base nesse gráfico, há indicação de efeito de interação entre os dois fatores genéticos (SNPA e SNPB)? Comente. 
+
+Pelos dados temos 2 fatores (SNPA e SNPB) com 3 níveis cada, \{aa, Aa, AA\} e \{bb, Bb, BB\}, respectivamente.
+
+```{r, echo=FALSE, warning=FALSE}
+library(ggplot2)
+```
+
+
+```{r, figures-side, fig.show="hold", out.width="50%"}
+
+# Construir gráficos de perfies de medias para cada população 
+myplots<-lapply(p_list, function(pop)
+p <- ggplot(pop) + 
+     aes(x = SNPA, y = media, group = SNPB, color = SNPB) +
+     geom_line(aes(linetype=SNPB, color=SNPB))
+)
+
+# printar os 7 graficos
+par(mar = c(4, 4, .1, .1))
+for (i in seq(1,7)) {
+    print(myplots[[i]] + ggtitle(paste0("Population ", i)) +
+              theme(plot.title = element_text(hjust = 0.5)))
+}
+```
+
+Apenas a população 1 tem linhas paralelas e portanto não haveria um efeito de interação entre os fatores. Para as demais populações há uma não paralelidade entre os fatores. Vamos fazer outras pontuações de efeito e magnitude de acordo com cada população:
+
+- População 1: Tem efeito principal tanto de SNPA quanto SNPB, sem efeito de interação.
+
+- População 2: A direção do efeito de SNPB muda de acordo com o nível de SNPA
+
+- População 3: Ou a direção do efeito de SNPB muda de acordo com o nível de SNPA ou o efeito principal é só de SNPB
+
+- População 4: Tem efeito de interação e a direção do efeito de SNPB muda de acordo com o nível de SNPA
+
+- População 5: A direção do efeito de SNPB muda de acordo com o nível de SNPA
+
+- População 6: A direção do efeito de SNPB muda de acordo com o nível de SNPA
+
+- População 7: Ou a direção do efeito de SNPB muda de acordo com o nível de SNPA ou o efeito principal é só de SNPB
+
+### Item B: Vamos agora gerar dados de Delineamentos Completamente Aleatorizados (DCA) com esquema Fatorial 3x3 (Fator SNPA e fator SNPB, ambos, em 3 níveis genotípicos).
+Considere $\sigma^2 = 1$ e, com base nas 9 médias apresentadas em P1 a P7, gere $r=25$ valores para cada um dos 9 grupos, sob o modelo de distribuição Normal. Em cada caso, obtenha a tabela de ANOVA e interprete os resultados.
+

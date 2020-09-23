@@ -42,11 +42,15 @@ initiate_opinions <- function(g, seed, prob_minus, prob_plus){
   V(g)$opinion = X0
   
   V(g)$color <- ifelse(V(g)$opinion == 1, "blue", "red")
+  
+  return(g)
+}
+
+# Plot opinions
+plot_opinions <- function(g){
   par(mar = c(0, 0, 0, 0)) # Set the margin on all sides to 0
   plot(g, vertex.label.color = "white", edge.color = "black", 
        vertex.size = 20)
-  
-  return(g)
 }
 
 # this functions simulates the change of opinion during during a user given number of epochs
@@ -72,9 +76,6 @@ model_opinions <- function(g, seed, epochs){
   }
   
   V(g)$color <- ifelse(V(g)$opinion == 1, "blue", "red")
-  par(mar = c(0, 0, 0, 0)) # Set the margin on all sides to 0
-  plot(g, vertex.label.color = "white", edge.color = "black", 
-       vertex.size = 20)
   
   return(list(g, df))
   

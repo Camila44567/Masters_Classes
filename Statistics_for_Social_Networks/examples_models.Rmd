@@ -1,10 +1,6 @@
 ---
 title: "Example Models"
-output:
-  pdf_document: 
-    keep_tex: yes
-    latex_engine: xelatex
-  html_notebook: default
+output: md_document
 ---
 
 Here I implement how to create two different example models of influencer sets, how to initiate actor opinions and how to simulate opinion changes/updates throughout a user defined number of iterations or epochs.
